@@ -27,6 +27,8 @@ async def usersjson():
            {"name": "Sebastian", "surname" : "Salinas", "url" : "http://youtube.com", "age" : 24 },
            {"name": "Emilio", "surname" : "Salinas", "url" : "http://facebook.com" , "age" : 20} ]
 
+
+#http://127.0.0.1:8000/users
 @app.get("/users")
 async def users():
     return users_list
@@ -46,7 +48,51 @@ async def user(id: int):
 @app.get("/userquery/")
 async def user(id: int):
     return search_users(id)
+
+
+#POST   http://127.0.0.1:8000/user
+@app.post("/user/")
+async def user(user:User):
+    if type(search_users(user.id))== User:
+        return {"error" : "El usuario ya existe" }
+    else:
+        users_list.append(user)
+
+#PUT http://127.0.0.1:8000/user
+
+@app.put("/user/")
+async def user(user:User):
+
+    found = False
+
+    for index, saved_user in enumerate(users_list):
+        if saved_user.id == user.id:
+            users_list[index] = user 
+            found = True    
     
+    if not found:
+        return {"error" : "No se ha actualizado al usuario"}
+    else:
+        return user 
+    
+#DELETE http://127.0.0.1:8000/users/4
+#AQUI USAMOS EL PTH PORQUE EL ID ES OBLIGATORIO
+@app.delete("/user/{id}")
+async def user(id: int):
+
+    found = False
+
+    for index, saved_user in enumerate(users_list):
+        if saved_user.id == id:
+           del  users_list[index] 
+           found = True  
+    if not found:
+        return {"error" : "No se ha eliminado al usuario"}
+    else:
+        return user 
+
+    
+
 
 #DEFINIMOS LA FUNCION PARA VER SI EXISTE EL USUARIO
 def search_users(id:int):
