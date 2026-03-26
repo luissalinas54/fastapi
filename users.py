@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel          #DEFINIMOS LA ENTDIDAD 
 
 
@@ -51,12 +51,18 @@ async def user(id: int):
 
 
 #POST   http://127.0.0.1:8000/user
-@app.post("/user/")
+#MENSAJE POR DEFECTO VA A EN LA CABECERA DEL METODO
+#response_model= User es el mensaje que da en la documentacion si funciono bien (un objeto de clase user)
+#MESNAJES DE ERROR USAMOS raise HTTPException
+#status_code=201 es el mensaje http que se da cuando se crea un objeto
+@app.post("/user/", response_model= User,status_code=201)
 async def user(user:User):
     if type(search_users(user.id))== User:
-        return {"error" : "El usuario ya existe" }
-    else:
-        users_list.append(user)
+        raise HTTPException(status_code=404, detail="El usuario ya existe")
+    
+    users_list.append(user)
+    return user
+
 
 #PUT http://127.0.0.1:8000/user
 
