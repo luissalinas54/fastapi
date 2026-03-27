@@ -1,9 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel          #DEFINIMOS LA ENTDIDAD 
 
 
 
-app = FastAPI()
+router = APIRouter()
 
 #INICIAR EL SERVER: uvicorn users:app --reload
 
@@ -21,7 +21,7 @@ users_list = [User(id = 1, name="Luis" , surname="Salinas", url="http://google.c
                 User(id = 2, name="Sebastian" , surname="Salinas", url="http://youtube.com", age=24),
                 User(id = 3, name="Emilio" , surname="Salinas", url="http://facebook.com", age=20)]
 
-@app.get("/usersjson")
+@router.get("/usersjson")
 async def usersjson():
     return [{"name": "Luis", "surname" : "Salinas", "url" : "http://googele.com", "age" : 26 },
            {"name": "Sebastian", "surname" : "Salinas", "url" : "http://youtube.com", "age" : 24 },
@@ -29,7 +29,7 @@ async def usersjson():
 
 
 #http://127.0.0.1:8000/users
-@app.get("/users")
+@router.get("/users")
 async def users():
     return users_list
 
@@ -38,14 +38,14 @@ async def users():
 #los {} SIGNIFICA QUE SON LOS PARAMETROS A CAPTURAR DE USERS
 #http://127.0.0.1:8000/user/1
 
-@app.get("/user/{id}")
+@router.get("/user/{id}")
 async def user(id: int):
    return search_users(id)
 
 #USAMOS LA QUERY (IGUALAR CLAVE A UN VALOR DE LA URL)
 #http://127.0.0.1:8000/useruserquery/?id=1
 
-@app.get("/userquery/")
+@router.get("/userquery/")
 async def user(id: int):
     return search_users(id)
 
@@ -55,7 +55,7 @@ async def user(id: int):
 #response_model= User es el mensaje que da en la documentacion si funciono bien (un objeto de clase user)
 #MESNAJES DE ERROR USAMOS raise HTTPException
 #status_code=201 es el mensaje http que se da cuando se crea un objeto
-@app.post("/user/", response_model= User,status_code=201)
+@router.post("/user/", response_model= User,status_code=201)
 async def user(user:User):
     if type(search_users(user.id))== User:
         raise HTTPException(status_code=404, detail="El usuario ya existe")
@@ -66,7 +66,7 @@ async def user(user:User):
 
 #PUT http://127.0.0.1:8000/user
 
-@app.put("/user/")
+@router.put("/user/")
 async def user(user:User):
 
     found = False
@@ -83,7 +83,7 @@ async def user(user:User):
     
 #DELETE http://127.0.0.1:8000/users/4
 #AQUI USAMOS EL PTH PORQUE EL ID ES OBLIGATORIO
-@app.delete("/user/{id}")
+@router.delete("/user/{id}")
 async def user(id: int):
 
     found = False
