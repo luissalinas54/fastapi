@@ -62,11 +62,12 @@ users_db = {
 }
 
 
-
+#BUSCAMOS USUARIO CON CONTRASEÑA
 def search_user_db(username: str):
     if username in users_db:
         return UserDB(**users_db[username])
     
+#BUSCAMOS USUARIO SIN CONTRASEÑA    
 def search_user(username: str):
     if username in users_db:
         return User(**users_db[username])
