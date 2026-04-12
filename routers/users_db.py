@@ -14,7 +14,7 @@ router = APIRouter(prefix="/userdb",
 #METODOS GET PARA OBTENER LOS USUARIOS DE LA BASE DE DATOS
 @router.get("/", response_model= list[User])
 async def users():
-    return users_schema(db_Client.local.users.find())
+    return users_schema(db_Client.users.find())
 
 @router.get("/{id}")
 async def user(id: str):
@@ -41,12 +41,12 @@ async def user(user:User):
     del user_dict["id"]
 
     #INSERTAMOS EL USUARIO EN LA BASE DE DATOS (USAMOS EL CLIENTE DB)
-    id = db_Client.local.users.insert_one(user_dict).inserted_id
+    id = db_Client.users.insert_one(user_dict).inserted_id
 
     #ACCEDEMOS A LA BASE DE DATOS PARA VER SI SE HA GUARDADO EL USUARIO Y LE ASIGNAMOS EL ID QUE NOS HA DADO LA BASE DE DATOS
     #fin one ENCUENTRA UN JSON POR LO QUE NECESITAMOS TRANSFORMARLO EN UN OBJETO DE LA CLASE USER PARA PODER DEVOLVERLO EN LA RESPUESTA
 
-    new_user = user_schem(db_Client.local.users.find_one({"_id": id}))
+    new_user = user_schem(db_Client.users.find_one({"_id": id}))
 
     #RETORNAMOS UN NUEVO USUARIO OASANDOLE TODAS LAS CLAVES DEL DICCIONARIO 
     return User(**new_user)
@@ -61,7 +61,7 @@ async def user(user:User):
     del user_dict["id"]
 
     try:
-        db_Client.local.users.find_one_and_replace(
+        db_Client.users.find_one_and_replace(
             {"_id": ObjectId(user.id)}, user_dict)
     except:
         return {"error" : "No se ha actualizado al usuario"}
@@ -74,7 +74,7 @@ async def user(user:User):
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def user(id: str):
 
-    found = db_Client.local.users.find_one_and_delete({"_id": ObjectId(id)})
+    found = db_Client.users.find_one_and_delete({"_id": ObjectId(id)})
     
     if not found:
         return {"error" : "No se ha eliminado al usuario"}
@@ -87,7 +87,7 @@ async def user(id: str):
 def search_user(field: str, key):
     
     try:
-        user = db_Client.local.users.find_one({field: key})
+        user = db_Client.users.find_one({field: key})
         return User(**user_schem(user))
     except:
         return {"error" : "No se ha encontrado al usuario"}
